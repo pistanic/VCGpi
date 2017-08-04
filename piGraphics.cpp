@@ -12,11 +12,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-extern "C"
-{
-	#include <wiringPi.h>
-}
 
+#include <wiringPi.h>
 #include <iostream>
 #include <ctime>
 #include <cmath>
@@ -59,87 +56,72 @@ inline double degToRad(double x)
 	return x * M_PI / 180.0; 
 }
 
-// Draw blue (0.0, 0.0, 0.9) cube with sides of unit length,
-// centered at (-1.5, 1.5, 0.0)
 void drawCube()
 {
+
 	glPushMatrix(); 
-	glColor3f(0.0, 0.0, 0.9); // Blue
-	glTranslatef(-1.5, 1.5, 0.0);
+	glColor3f(0.9,0.3,0.9);
 	glutSolidCube(1.0);
 	glPopMatrix(); 
 
 }
 
-// Draw magenta (0.9, 0.0, 0.9) sphere with radius 1/sqrt(2)
-// centered at (0.0, 0.0, 0.0)
-void drawSphere()
+void drawHexagon()
 {
-	glPushMatrix(); 
-	glColor3f(0.9,0.0,0.9); // Magenta 
-	glutSolidSphere((1.0/sqrt2), 15, 15);
-	glPopMatrix(); 
-}
 
-// Draw cyan (0.0, 0.9, 0.9) tetrahedron with sides length sqrt(2)
-// centered at (1.5, -1.5, 0.0)
-void drawTetrahedron()
-{
-	// Tetrahedron Vertices 
-	static const GLfloat vertices[][3] = 
+	GLfloat firstHex[6][3];
+	GLfloat secondHex[6][3];
+	glBegin(GL_POLYGON);
+	for (GLint i = 0; i < 6; i++)
 	{
-
-	  {0.0, 0.0, 0.61237},
-	  {0.5, 0.28867, -0.20412},
-	  {-0.5, 0.28867, -0.24012}, 
-	  {0.0, -0.57735, -0.20412}
-
-	};
-	
-	// Tetrahedon Faces 
-	// triplets are sets of vertex indecies for face
-	// Note: specified in CCW order
-	static const int faces[][3] = 
-	{
-
-	  {0, 1, 2},
-	  {0, 2, 3},
-	  {0, 3, 1},
-	  {3, 2, 1}
-
-	};
-	
-	static const GLfloat normals[][3] = 
-	{
-
-	  {0.0, 0.942809, 0.3333334},
-	  {-0.816497, -0.471405, 0.333333},	
-	  {0.816497, -0.471405, 0.333333}, 
-	  {0.0, 0.0, -1.0}
-	 
-	};
-
-	// Draw tetrahedron 
-	glBegin(GL_TRIANGLES);
-	for(int i = 0; i < 4; ++i) // For each face
-	{
-
-	  glNormal3f(normals[i][0], normals[i][1], normals[i][2]);
- 
-	  for(int j = 0; j < 3; ++j) // For each vertex
-	  {
-
-	    int v = faces[i][j];
-	    // Specify Colors 
-	    glColor3f(0.0,0.9,0.9); // Cyan 
-	    // Specify position of the vertex
-	    glVertex3f(vertices[v][0], vertices[v][1], vertices[v][2]); 
-	    
-	  }
-
+		GLfloat angle = 2 * M_PI / 6 * (i + 0.5);
+		GLfloat x_tempVertex = sqrt(2)*cos(angle);
+		GLfloat z_tempVertex = sqrt(2)*sin(angle);
+		firstHex[i][0] = x_tempVertex;
+		firstHex[i][1] = 0;
+		firstHex[i][2] = z_tempVertex;
+		glVertex3f(x_tempVertex, 0, z_tempVertex);
 	}
 
-	glEnd(); 	
+	glEnd();
+
+	glBegin(GL_POLYGON);
+
+	for (GLint i = 0; i < 6; i++)
+	{
+		GLfloat angle = 2 * M_PI / 6 * (i + 0.5);
+		GLfloat x_tempVertex = sqrt(2)*cos(angle);
+		GLfloat z_tempVertex = sqrt(2)*sin(angle);
+		secondHex[i][0] = x_tempVertex;
+		secondHex[i][1] = sqrt(2);
+		secondHex[i][2] = z_tempVertex;
+		glVertex3f(x_tempVertex, sqrt(2), z_tempVertex);
+	}
+
+	glEnd();
+
+// Begin filling the rectangles between the two hexagons
+// drawing begins at ( 0, 0, 0 ) and moves clockwise
+
+	glColor3f(0.9,0.0,0.9);
+	glBegin(GL_QUADS);
+	
+	for (GLint i = 0; i < 5; i++)
+	{
+		glVertex3f(firstHex[i][0], firstHex[i][1], firstHex[i][2]); // top left
+		glVertex3f(secondHex[i][0], secondHex[i][1], secondHex[i][2]); // bottom left
+		glVertex3f(secondHex[i+1][0], secondHex[i+1][1], secondHex[i+1][2]); // top right
+		glVertex3f(firstHex[i+1][0], firstHex[i+1][1], firstHex[i+1][2]); // bottom right
+	}
+
+	// corner case (connecting the end to the beginning)
+	glVertex3f(firstHex[5][0], firstHex[5][1], firstHex[5][2]); // top left
+	glVertex3f(secondHex[5][0], secondHex[5][1], secondHex[5][2]); // bottom left
+	glVertex3f(secondHex[0][0], secondHex[0][1], secondHex[0][2]); // top right
+	glVertex3f(firstHex[0][0], firstHex[0][1], firstHex[0][2]); // bottom right
+
+	glEnd();
+
 
 }
 
@@ -166,17 +148,12 @@ void display()
 	// Set the position of light to 0
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 
-	// Draw Cube 
 	drawCube(); 
 
-	// Draw Sphere 
-	drawSphere(); 
-	
 	// Draw Tetrahedron with light enabled
 	glPushMatrix();
-	glTranslatef(1.5, -1.5, 0.0);
-	glScalef(sqrt2, sqrt2, sqrt2);
-	drawTetrahedron(); 
+	//drawHexagon(); 
+	
 	glPopMatrix(); 
 
 	// Restore old modelview matrix
@@ -218,14 +195,6 @@ void keyboard(unsigned char key, int x, int y)
 
 	switch(key) {
 
-	case 'R':
-		theta += 5;
-	 	glutPostRedisplay(); 
-		break;
-	case 'r':
-		theta -= 5;
-		glutPostRedisplay();
-		break;
 	case 'Z':
 		phi += 0.1;
 		glutPostRedisplay(); 
