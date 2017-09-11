@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 project(OpenGL/CGAL  LANGUAGES CXX)
 
-#add_definitions(-std=c++0x -lwiringPi)
+#add_definitions(-std=c++0x)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}-std=c++14 -O -lwiringPi")
-set(CMAKE_PREFIX_PATH /home/pi/SPL)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}-std=c++14 -O")
+set(CMAKE_PREFIX_PATH /home/nick/SPL)
 
 # Add Frounding to complie options 
 
@@ -19,10 +19,6 @@ find_package(CGAL REQUIRED)
 #Find SPL
 find_package(SPL REQUIRED)
 
-#Find Write 
-find_package(WiringPi REQUIRED)
-
-find_package(Threads REQUIRED)
 
 ######   Hack might be needed for some systems   #####
 if (NOT GLUT_Xmu_LIBRARY OR NOT GLUT_Xmi_LIBRARY)
@@ -40,17 +36,16 @@ endif()
 include_directories(${GLUT_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS})
 include_directories(${CGAL_INCLUDE_DIRS})
 include_directories(${SPL_INCLUDE_DIRS})
-#include_directories(${WIRINGPI_INCLUDE_DIRS})
 # Link Libraries 
 
 #link_libraries(${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
 link_libraries(glut X11 GL GLU)
 link_libraries(${CGAL_LIBRARY} ${GMP_LIBRARIES})
 link_libraries(${SPL_LIBRARYS})
-#link_libraries(${WIRING_PI_LIBRARIES})
 
 # Generate Executable files
 #add_executable(triMeshInfo triMeshInfo.cpp)
 #add_executable(limitSurfInfo limitSurfInfo.cpp)
 add_executable(PItest piGraphics.cpp)
+add_executable(chaosLines chaosLines.cpp)
 #add_executable(triMeshView triMeshView.cpp)
