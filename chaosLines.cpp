@@ -5,9 +5,10 @@
 //	 
 // Program Commands: 
 // 	Quit the program: q
-//	Increase theta value by 5 degrees: r 
-//	Decrease Phi value by 0.1: z
-//	Groound GPIO pin 17 to increase thetae by 5 
+//	"Walk" : w,s,a,d
+//	Subdevide Trapizod: x
+//	Randomize topographic points: f
+// 
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include <queue>
@@ -46,6 +47,10 @@ typedef CGAL::Bbox_3 Bbox_3;
 typedef SPL::Arcball<Kernel> ArcBall;
 typedef SPL::Rotation_3<Kernel> Rotation3;
 
+///////////////////////////////////////////////////////////////////////////
+// Following containers were provided by Dr. Michael Adams
+///////////////////////////////////////////////////////////////////////////
+
 // A vertex type (to be used with Polyhedron_3) that includes some 
 // // user-defined information.
 template <class Refs, class Traits, class P>
@@ -67,6 +72,10 @@ struct MyItems : public CGAL::Polyhedron_items_3 {
                   Vertex;
         };
 };
+
+/////////////////////////////////////////////////////////////////////////////
+// End of Provided Code
+/////////////////////////////////////////////////////////////////////////////
 
 typedef CGAL::Polyhedron_3<Kernel, MyItems> Polyhedron;
 
